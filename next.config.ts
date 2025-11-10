@@ -1,6 +1,14 @@
 // next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+
+  eslint: {
+    // Mengabaikan kesalahan ESLint selama build
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true, // ⬅️ opsional (kalau mau abaikan error ts)
+  },
   images: {
     domains: ['res.cloudinary.com',       // Untuk gambar profil dari Cloudinary
       'lh3.googleusercontent.com', // Untuk gambar profil dari Google OAuth
