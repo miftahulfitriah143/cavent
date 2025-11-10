@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,9 +23,25 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "outDir": "./dist" // Tambahkan ini agar ts-node tahu di mana harus meletakkan output
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.cjs",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.mjs",
+    "**/*.ts",
+    "**/*.tsx", // Tambahkan jika ada file mjs
+    "next-env.d.ts", // Tambahkan jika ada file cjs
+    "prisma/seed.ts" // Pastikan file seed Anda termasuk dalam kompilasi
+    ,
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

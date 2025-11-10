@@ -1,0 +1,131 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============== NextAuth.js Models ==============
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // onDelete: Cascade di sini berarti jika User dihapus, semua akun terkait juga dihapus.
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // onDelete: Cascade di sini berarti jika User dihapus, semua sesi terkait juga dihapus.
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  isVerified    Boolean   @default(true)
+
+  accounts Account[]
+  sessions Session[]
+
+  // Relasi ke model event, registration, feedback Anda
+  events        Event[]
+  registrations Registration[]
+  feedbacks     Feedback[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ===============================================
+
+// Enum untuk peran pengguna
+enum Role {
+  ADMIN
+  ORGANIZER
+  USER
+}
+
+// Model untuk Event
+model Event {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  imageUrl    String?
+  date        DateTime
+  time        String
+  location    String
+  price       String
+  slug        String      @unique
+  benefits    String[]
+  organizerId String
+  organizer   User        @relation(fields: [organizerId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  status      EventStatus @default(UPCOMING)
+
+  registrations Registration[]
+  feedbacks     Feedback[]
+}
+
+// Model untuk Pendaftaran Event
+model Registration {
+  id           String   @id @default(uuid())
+  userId       String
+  eventId      String
+  registeredAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade) // <--- TAMBAHKAN onDelete: Cascade
+  // Ini berarti jika sebuah Event dihapus, semua Registration yang merujuk ke Event tersebut juga akan dihapus.
+
+  @@unique([userId, eventId])
+}
+
+// Model untuk Feedback Event
+model Feedback {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  rating    Int
+  comment   String?
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade) // <--- TAMBAHKAN onDelete: Cascade
+  // Ini berarti jika sebuah Event dihapus, semua Feedback yang merujuk ke Event tersebut juga akan dihapus.
+  createdAt DateTime @default(now())
+}
+
+enum EventStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+}

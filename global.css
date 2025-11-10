@@ -1,0 +1,17 @@
+/* src/app/globals.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Gaya dasar untuk dark mode */
+html.dark {
+  /* Contoh: mengubah warna background default */
+  background-color: #1a202c; /* Warna gelap */
+  color: #e2e8f0; /* Warna teks terang */
+}
+
+/* Anda juga bisa menargetkan elemen spesifik jika perlu */
+/* .dark .bg-gray-50 {
+  background-color: #2d3748;
+} */
